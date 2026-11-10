@@ -3,12 +3,17 @@
 A real-time multiplayer **SQL adventure game** for the classroom. Students are hired
 as junior analysts at Proimprint HQ (the dropship print shop) and work through
 **10 gated SQL challenges** across the hip office, guided by cute characters
-(Dot the office dog, BrewBot 3000, Captain Valor the CEO unicorn…).
+(Doug the welcome wagon, Pip the jittery intern, Mr. Nimbus the CEO…).
 
 Players enter their name (and pick a cute avatar) at the start, then walk floor
 by floor. Each floor is one scene with one challenge; clearing it unlocks the next.
 SQL runs **100% in the browser** with sql.js (SQLite → WebAssembly), so nothing
 leaves the student's laptop except their roster presence.
+
+Between floors, players get a quick **arcade interlude — "Fulfillment
+Rush"**: steer the courier cart and catch falling orders (📦 +10, ☕ +5,
+🎁 +25) while dodging socks nobody ordered (🧦 −6). It gets faster each
+floor, and the office record is saved locally.
 
 ## The 10 challenges (difficulty ramp)
 

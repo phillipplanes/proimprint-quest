@@ -6,6 +6,7 @@
 
 import { initDb, query } from './db.js';
 import { CHALLENGES } from './challenges.js';
+import { renderArcade } from './arcade.js';
 import * as mp from './multiplayer.js';
 
 /* ---- Supabase config (safe to hardcode: anon key is public) ---- */
@@ -16,7 +17,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_SUHTWIazvjUh7LBOWyCEWA_bNGyhsH7";
 const app = document.getElementById('app');
 
 const state = {
-  name: '', emoji: '🦊',
+  name: '', emoji: '🕵️',
   scene: parseInt(localStorage.getItem('pq_scene') || '0'),
   completed: parseInt(localStorage.getItem('pq_completed') || '0'),
   roster: [], chat: [],
@@ -27,7 +28,7 @@ function persist() {
   localStorage.setItem('pq_completed', state.completed);
 }
 
-const AVATARS = ['🦊','🐼','🐶','🐱','🐹','🦉','🦄','🦩','🐢','🐸','🐙','🦖','🐝','🦋','🐬','🦜'];
+const AVATARS = ['🕵️','🧑‍🎤','🧑‍🚀','👩‍🔬','🧑‍🔧','🧙‍♀️','🦹‍♀️','👩‍🌾','🧑‍🎨','🤵','👩‍💼','🧑‍🍳','🕺','💃','🙋‍♂️','💁‍♀️'];
 
 /* ============================================================ */
 async function boot() {
@@ -237,15 +238,26 @@ function runChallenge(c) {
     mp.setScene(state.scene + 1, state.completed);
     setTimeout(() => {
       if (state.completed < CHALLENGES.length) {
-        state.scene += 1;
-        state.lastSql = '';
-        toast(`🎉 Floor cleared! Welcome to the ${CHALLENGES[state.scene].scene}!`);
-        renderGame();
+        showBonusRound(state.scene + 1);
       } else {
-        renderGame();
+        renderGame();  // all floors cleared → victory
       }
     }, 1600);
   }
+}
+
+/* ---------------- arcade interlude between floors ---------------- */
+function showBonusRound(nextScene) {
+  renderArcade(app, {
+    level: state.completed,        // floors cleared → difficulty
+    clearedFloor: state.completed,
+    onDone: (score) => {
+      state.scene = nextScene;
+      state.lastSql = '';
+      toast(`🎉 Packing shift done — ${score} pts! Welcome to the ${CHALLENGES[state.scene].scene}!`);
+      renderGame();
+    },
+  });
 }
 
 function sameShape(user, exp, c) {
