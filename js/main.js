@@ -108,7 +108,14 @@ function onRemote(data) {
   } else if (data.chat) {
     if (!state.chat.some(m => m.id === data.chat.id)) state.chat = [...state.chat, { name: data.chat.name, text: data.chat.text, id: data.chat.id }].slice(-50);
   }
-  renderGame();
+  // Patch only the live panels in place. Never re-render the whole app here:
+  // realtime events fire for our own progress/heartbeat updates too, and a
+  // full re-render would stomp the intro, the arcade bonus round, or an
+  // unsolved challenge mid-typing.
+  if (app.querySelector('#rosterList')) renderRoster();
+  if (app.querySelector('#chatMsgs')) renderChat();
+  const fr = app.querySelector('#finalRoster');
+  if (fr) fr.innerHTML = finalRosterHtml();
 }
 
 /* ---------------- main game screen ---------------- */
@@ -328,7 +335,11 @@ function renderVictory() {
     </div>`;
   confetti(60);
   const fr = app.querySelector('#finalRoster');
-  if (fr) fr.innerHTML = state.roster.map(p =>
+  if (fr) fr.innerHTML = finalRosterHtml();
+}
+
+function finalRosterHtml() {
+  return state.roster.map(p =>
     `<div class="player"><div class="avatar">${p.emoji || '🙂'}</div>
      <div class="pinfo"><div class="pname">${esc(p.name)}</div>
      <div class="ptask">${p.completed}/10 challenges</div></div></div>`).join('');
