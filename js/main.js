@@ -114,6 +114,7 @@ function onRemote(data) {
   // unsolved challenge mid-typing.
   if (app.querySelector('#rosterList')) renderRoster();
   if (app.querySelector('#chatMsgs')) renderChat();
+  if (app.querySelector('#questMap')) renderPeers();
   const fr = app.querySelector('#finalRoster');
   if (fr) fr.innerHTML = finalRosterHtml();
 }
@@ -128,9 +129,13 @@ function renderGame() {
     <div class="hud">
       <div class="pill"><span class="em">${state.emoji}</span> ${esc(state.name)}</div>
       <div class="pill"><span class="em">🏅</span> ${state.completed}/${CHALLENGES.length} challenges</div>
-      <div class="map">${CHALLENGES.map((_, i) =>
-        `<div class="node ${i < state.completed ? 'done' : i === state.scene ? 'current' : 'locked'}" title="Challenge ${i+1}">${i < state.completed ? '✓' : i + 1}</div>`).join('')}
+      <div class="map" id="questMap">${CHALLENGES.map((_, i) =>
+        `<div class="node-col" title="Challenge ${i+1}">
+           <div class="node ${i < state.completed ? 'done' : i === state.scene ? 'current' : 'locked'}">${i < state.completed ? '✓' : i + 1}</div>
+           <div class="node-peers"></div>
+         </div>`).join('')}
       </div>
+      <button id="resetBtn" class="ghost small">🔄 Reset</button>
     </div>
 
     <div class="grid">
@@ -193,6 +198,7 @@ function renderGame() {
   // roster
   renderRoster();
   renderChat();
+  renderPeers();
 
   // wiring
   const run = () => runChallenge(c);
@@ -200,6 +206,26 @@ function renderGame() {
   app.querySelector('#sql').addEventListener('keydown', e => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) run();
   });
+
+  // two-step reset: first click arms, second click within 3s resets
+  const resetBtn = app.querySelector('#resetBtn');
+  let armed = false, disarmT = null;
+  resetBtn.onclick = () => {
+    if (!armed) {
+      armed = true;
+      resetBtn.textContent = '⚠️ Sure? Click again';
+      resetBtn.classList.add('danger');
+      disarmT = setTimeout(() => {
+        armed = false;
+        resetBtn.textContent = '🔄 Reset';
+        resetBtn.classList.remove('danger');
+      }, 3000);
+    } else {
+      clearTimeout(disarmT);
+      resetGame();
+      toast('🔄 Quest reset — back to the Lobby!');
+    }
+  };
   app.querySelector('#hintBtn').onclick = () => toast('💡 ' + c.hint);
   app.querySelector('#schemaBtn').onclick = () => toast('Tables: customers, products, distributors, suppliers, orders, order_items', 6000);
   const cf = app.querySelector('#chatForm');
@@ -300,6 +326,36 @@ function solvedMsg(c) {
 }
 
 /* ---------------- roster & chat ---------------- */
+function resetGame() {
+  state.scene = 0;
+  state.completed = 0;
+  state.lastSql = '';
+  persist();
+  mp.setScene(0, 0);
+}
+
+function renderPeers() {
+  const map = app.querySelector('#questMap');
+  if (!map) return;
+  const cols = map.querySelectorAll('.node-col');
+  cols.forEach(col => { col.querySelector('.node-peers').innerHTML = ''; });
+  const meId = localStorage.getItem('pq_player_id');
+  const players = [...state.roster];
+  if (state.name && !players.some(p => p.id === meId)) {
+    players.push({ id: meId, name: state.name, emoji: state.emoji, scene: state.scene, completed: state.completed });
+  }
+  players.forEach(p => {
+    const idx = Math.min(p.scene ?? 0, CHALLENGES.length - 1);
+    const cell = cols[idx]?.querySelector('.node-peers');
+    if (!cell) return;
+    const s = document.createElement('span');
+    s.className = 'peer' + (p.id === meId ? ' me' : '');
+    s.textContent = p.emoji || '🙂';
+    s.title = `${p.name || 'Analyst'}${p.id === meId ? ' (you)' : ''} · ${mp.sceneLabel(p.scene ?? 0, p.completed ?? 0)}`;
+    cell.appendChild(s);
+  });
+}
+
 function renderRoster() {
   const el = app.querySelector('#rosterList');
   if (!el) return;
@@ -329,12 +385,18 @@ function renderVictory() {
       <div class="trophy">🏆</div>
       <h1>Quest complete, ${esc(state.name)}!</h1>
       <p class="sub mt">You mastered all 10 SQL challenges and survived your first week at Proimprint. Here's your promotion: <b>Junior Data Analyst II</b> 🎉</p>
-      <div class="mt"><button onclick="location.reload()">Play again</button></div>
+      <div class="mt"><button id="againBtn">Play again</button></div>
       ${mp.hasSupabase() ? '<div class="mt roster" id="finalRoster"></div>' : ''}
     </div>`;
   confetti(60);
   const fr = app.querySelector('#finalRoster');
   if (fr) fr.innerHTML = finalRosterHtml();
+  const again = app.querySelector('#againBtn');
+  if (again) again.onclick = () => {
+    resetGame();
+    renderGame();
+    toast('🔄 Fresh start — Floor 1, here we come!');
+  };
 }
 
 function finalRosterHtml() {

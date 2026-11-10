@@ -18,6 +18,12 @@ keyword ↔ purpose matching board, an 8×8 SQL word search
 (COUNT, SUM, GROUP BY…), a clause-ordering challenge, and a
 "which result does this query return?" finale.
 
+**Live quest map & reset:** every player's avatar appears under the floor
+they're currently on in the progress map (hover for their name and status),
+updated in real time for all players. A 🔄 Reset button (click twice to
+confirm) restarts your own progress, and the victory screen's "Play again"
+properly resets the quest instead of reloading into the trophy screen.
+
 ## The 10 challenges (difficulty ramp)
 
 | # | Scene | SQL skills |
