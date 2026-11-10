@@ -290,7 +290,7 @@ function gameMatches(container, onDone) {
 function gameWordSearch(container, onDone) {
   const { area, fb, end } = scaffold(container,
     '📋 Bulletin Board: SQL Word Search',
-    'Find the six hidden SQL keywords — click a word\'s first letter, then its last. Ahead of you: aggregation words.');
+    'The six SQL keywords are listed below — click a word\'s first letter, then its last letter. Really stuck? Tap 💡 Hint!');
   const SIZE = 8;
   const WORDS = ['SUM', 'COUNT', 'GROUP', 'LIMIT', 'ORDER', 'AVG'];
   const DIRS = [[0, 1], [1, 0], [1, 1]];
@@ -331,19 +331,38 @@ function gameWordSearch(container, onDone) {
   const { filled, placed } = build();
   const foundCells = new Set();
   let sel = null;
+  let hintsLeft = 3;
 
   const foundWords = () => placed.filter(p => p.found).map(p => p.word);
 
   const render = () => {
     area.innerHTML = `
-      <p class="sub">Found: ${placed.map(p => p.found
-        ? `<s>${p.word}</s>` : `<b>${'?'.repeat(p.word.length)}</b>`).join(' · ')}</p>
+      <div class="ws-bar">
+        <p class="sub">Find: ${placed.map(p => p.found
+          ? `<s>${p.word}</s>` : `<b>${p.word}</b>`).join(' · ')}</p>
+        <button id="wsHint" class="ghost small" ${hintsLeft ? '' : 'disabled'}>💡 Hint (${hintsLeft})</button>
+      </div>
       <div class="ws-grid">${filled.map((row, r) => row.map((ch, c) =>
         `<button class="ws ${foundCells.has(r + ',' + c) ? 'hit' : ''} ${sel && sel[0] === r && sel[1] === c ? 'sel' : ''}" data-r="${r}" data-c="${c}">${ch}</button>`).join('')).join('')}</div>`;
   };
   render();
 
+  const useHint = () => {
+    if (hintsLeft <= 0) return;
+    const target = placed.find(p => !p.found);
+    if (!target) return;
+    hintsLeft--;
+    render();
+    const [hr, hc] = target.cells[0];
+    const cell = area.querySelector(`.ws[data-r="${hr}"][data-c="${hc}"]`);
+    cell.classList.add('hint');
+    setTimeout(() => cell.classList.remove('hint'), 2600);
+    fb.className = 'feedback info';
+    fb.textContent = `💡 One of the words starts at a glowing tile! ${hintsLeft} hint${hintsLeft === 1 ? '' : 's'} left.`;
+  };
+
   area.onclick = e => {
+    if (e.target.closest('#wsHint')) { useHint(); return; }
     const b = e.target.closest('.ws');
     if (!b) return;
     const r = +b.dataset.r, c = +b.dataset.c;

@@ -108,6 +108,7 @@ textarea#sql:focus { outline: 2px solid var(--accent); }
 .feedback { margin-top: 10px; padding: 12px 14px; border-radius: 12px; font-weight: 700; display: none; }
 .feedback.ok { display: block; background: #e8fbef; color: #15803d; border: 2px solid var(--good); }
 .feedback.err { display: block; background: #feeceb; color: #b91c1c; border: 2px solid var(--bad); }
+.feedback.info { display: block; background: #f3ecfa; color: var(--accent); border: 2px solid #8d6bb0; }
 .feedback .detail { font-weight: 400; margin-top: 6px; font-size: .85rem; }
 
 .editor-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
@@ -260,6 +261,8 @@ button.ghost.danger { background: #fee2e2; color: #b91c1c; border-color: #b91c1c
 .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
 .ws-grid { display: grid; grid-template-columns: repeat(8, 46px); gap: 5px; justify-content: center; margin-top: 14px; }
+.ws-bar { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.ws-bar .sub { flex: 1; min-width: 200px; }
 .ws {
   height: 46px; border-radius: 8px; background: #f6f1fd; color: var(--ink);
   border: 2px solid transparent; font-weight: 800; padding: 0; box-shadow: none;
@@ -267,6 +270,8 @@ button.ghost.danger { background: #fee2e2; color: #b91c1c; border-color: #b91c1c
 .ws:hover { transform: none; box-shadow: none; background: #efe7fa; }
 .ws.sel { border-color: var(--accent); background: #e7d9fa; }
 .ws.hit { background: var(--accent); color: #fff; pointer-events: none; }
+.ws.hint { background: #fde68a; border-color: #f59e0b; animation: hintPulse .6s ease 4; }
+@keyframes hintPulse { 50% { transform: scale(1.15); } }
 
 .built-query {
   font-family: "Fira Code", Consolas, monospace; font-size: .95rem; white-space: pre;
