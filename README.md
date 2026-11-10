@@ -51,6 +51,7 @@ Without Supabase the game runs fully in **solo mode**. With it, students also se
 
 - 🏢 a live roster ("Who's in the office") with everyone's progress bars and current scene
 - 🗺️ every classmate's avatar on the quest map, under the floor they're on
+- 📈 an office feed with everyone's milestones — clock-ins, floor clears, quest finishes
 
 Setup:
 

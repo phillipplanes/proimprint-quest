@@ -20,7 +20,7 @@ const state = {
   name: '', emoji: '🕵️',
   scene: parseInt(localStorage.getItem('pq_scene') || '0'),
   completed: parseInt(localStorage.getItem('pq_completed') || '0'),
-  roster: [], lastResult: null,
+  roster: [], feed: [], lastResult: null,
 };
 function persist() {
   localStorage.setItem('pq_scene', state.scene);
@@ -102,6 +102,17 @@ function renderIntro(mpOk) {
 
 function onRemote(data) {
   if (data.roster) { state.roster = data.roster; }
+  if (data.event) {
+    const ev = data.event;
+    const myId = localStorage.getItem('pq_player_id');
+    const who = esc(ev.name || 'Analyst') + (ev.id === myId ? ' (you)' : '');
+    let text;
+    if (ev.kind === 'join') text = `${who} clocked in — welcome to the office!`;
+    else if (ev.kind === 'victory') text = `🏆 ${who} finished the quest — Junior Data Analyst II!`;
+    else text = `🎉 ${who} cleared the ${CHALLENGES[ev.floor - 1]?.scene ?? 'Floor ' + ev.floor}!`;
+    state.feed = [{ emoji: ev.emoji || '🙂', text }, ...state.feed].slice(0, 14);
+    if (app.querySelector('#feed')) renderFeed();
+  }
   // Patch only the live panels in place. Never re-render the whole app here:
   // realtime events fire for our own progress/heartbeat updates too, and a
   // full re-render would stomp the intro, the arcade bonus round, or an
@@ -171,6 +182,10 @@ function renderGame() {
         <div class="card roster">
           <p class="section-label">🏢 Who's in the office</p>
           <div id="rosterList"></div>
+        </div>
+        <div class="card mt">
+          <p class="section-label">📈 Office feed</p>
+          <div id="feed"></div>
         </div>` : `
         <div class="card">
           <p class="section-label">🏢 Solo mode</p>
@@ -186,6 +201,7 @@ function renderGame() {
   // roster
   renderRoster();
   renderPeers();
+  renderFeed();
 
   // wiring
   const run = () => runChallenge(c);
@@ -303,6 +319,14 @@ function showResult(res) {
 function solvedMsg(c) {
   return `${c.guide.emoji} ${c.guide.name} says: ${
     ['Nailed it!','Spectacular!','You get it!','CEO-grade work!','Spot on!','Smooth!','Legendary!','Textbook!','Wizardry!','Boardroom-ready!'][c.id - 1]}`;
+}
+
+function renderFeed() {
+  const el = app.querySelector('#feed');
+  if (!el) return;
+  el.innerHTML = state.feed.length
+    ? state.feed.map(f => `<div class="feed-item"><span class="fem">${f.emoji}</span> ${f.text}</div>`).join('')
+    : '<p class="sub">Quiet office… progress updates will appear here.</p>';
 }
 
 /* ---------------- roster ---------------- */

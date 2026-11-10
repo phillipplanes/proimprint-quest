@@ -41,14 +41,37 @@ export async function joinGame(name, emoji, callback) {
   await upsert({ scene: 0, completed: 0 });
   startHeartbeat();
 
-  // Realtime: any player row changes -> refresh roster
+  // Realtime: any player row change -> refresh roster, and surface
+  // progress milestones (floor clears, joins, finishes) as feed events.
   const ch = sb.channel('pq-players')
     .on('postgres_changes',
       { event: '*', schema: 'public', table: 'players' },
-      () => refresh())
+      (payload) => {
+        const ev = progressEvent(payload);
+        refresh();
+        if (ev) onChange(ev);
+      })
     .subscribe();
   subs.push(ch);
   await refresh();
+}
+
+/* Turn a players-table change into a human milestone, or null for noise. */
+function progressEvent(payload) {
+  const neu = payload.new, alt = payload.old;
+  const evtType = payload.eventType || payload.event;
+  if (!neu) return null;
+  if (evtType === 'INSERT' || alt == null) {
+    return { kind: 'join', id: neu.id, name: neu.name, emoji: neu.emoji };
+  }
+  const before = alt.completed ?? 0, after = neu.completed ?? 0;
+  if (after > before) {
+    return {
+      kind: after >= CHALLENGES.length ? 'victory' : 'floor',
+      id: neu.id, name: neu.name, emoji: neu.emoji, floor: after,
+    };
+  }
+  return null;   // heartbeat / scene nudges stay silent
 }
 
 async function upsert(patch) {
