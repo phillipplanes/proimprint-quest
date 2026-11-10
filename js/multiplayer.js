@@ -1,6 +1,6 @@
 /* ============================================================
-   multiplayer.js — Supabase-backed presence & chat.
-   Requires a `players` and `messages` table (see supabase/schema.sql).
+   multiplayer.js — Supabase-backed player presence.
+   Requires a `players` table (see supabase/schema.sql).
    If Supabase isn't configured, the game still works fully solo.
    ============================================================ */
 
@@ -10,7 +10,7 @@ let sb = null;          // supabase client
 let myId = null;        // my player id
 let me = null;          // my { name, emoji }
 let subs = [];          // realtime subscriptions
-let onChange = () => {}; // callback when roster/chat updates
+let onChange = () => {}; // callback when roster updates
 
 const ONLINE_MS = 60_000;
 
@@ -46,9 +46,6 @@ export async function joinGame(name, emoji, callback) {
     .on('postgres_changes',
       { event: '*', schema: 'public', table: 'players' },
       () => refresh())
-    .on('postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'messages' },
-      (payload) => onChange({ chat: payload.new }))
     .subscribe();
   subs.push(ch);
   await refresh();
@@ -83,13 +80,6 @@ export async function refresh() {
     .gte('last_seen', cutoff)
     .order('completed', { ascending: false });
   onChange({ roster: data || [] });
-}
-
-export async function sendMessage(text) {
-  if (!sb || !me || !text.trim()) return;
-  try {
-    await sb.from('messages').insert({ name: me.name, text: text.trim().slice(0, 200) });
-  } catch (e) { console.warn(e); }
 }
 
 export function disconnect() {

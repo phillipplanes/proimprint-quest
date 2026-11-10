@@ -50,7 +50,7 @@ properly resets the quest instead of reloading into the trophy screen.
 Without Supabase the game runs fully in **solo mode**. With it, students also see:
 
 - 🏢 a live roster ("Who's in the office") with everyone's progress bars and current scene
-- 💬 an office chat
+- 🗺️ every classmate's avatar on the quest map, under the floor they're on
 
 Setup:
 
@@ -90,7 +90,7 @@ index.html            — entry point
 css/style.css         — cute office styling
 js/db.js              — in-browser SQLite database + Proimprint seed data
 js/challenges.js      — the 10 challenges, scenes, characters, stories
-js/multiplayer.js     — Supabase presence + chat (optional)
+js/multiplayer.js     — Supabase player presence (optional)
 js/main.js            — game engine: scenes, editor, validation, confetti
 supabase/schema.sql   — tables + RLS policies for multiplayer
 ```

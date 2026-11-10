@@ -20,8 +20,7 @@ const state = {
   name: '', emoji: '🕵️',
   scene: parseInt(localStorage.getItem('pq_scene') || '0'),
   completed: parseInt(localStorage.getItem('pq_completed') || '0'),
-  roster: [], chat: [],
-  lastResult: null,
+  roster: [], lastResult: null,
 };
 function persist() {
   localStorage.setItem('pq_scene', state.scene);
@@ -103,17 +102,11 @@ function renderIntro(mpOk) {
 
 function onRemote(data) {
   if (data.roster) { state.roster = data.roster; }
-  if (data.chatAll) {
-    state.chat = data.chatAll.map(m => ({ name: m.name, text: m.text, id: m.id }));
-  } else if (data.chat) {
-    if (!state.chat.some(m => m.id === data.chat.id)) state.chat = [...state.chat, { name: data.chat.name, text: data.chat.text, id: data.chat.id }].slice(-50);
-  }
   // Patch only the live panels in place. Never re-render the whole app here:
   // realtime events fire for our own progress/heartbeat updates too, and a
   // full re-render would stomp the intro, the arcade bonus round, or an
   // unsolved challenge mid-typing.
   if (app.querySelector('#rosterList')) renderRoster();
-  if (app.querySelector('#chatMsgs')) renderChat();
   if (app.querySelector('#questMap')) renderPeers();
   const fr = app.querySelector('#finalRoster');
   if (fr) fr.innerHTML = finalRosterHtml();
@@ -178,15 +171,10 @@ function renderGame() {
         <div class="card roster">
           <p class="section-label">🏢 Who's in the office</p>
           <div id="rosterList"></div>
-        </div>
-        <div class="card chat mt">
-          <p class="section-label">💬 Office chat</p>
-          <div class="msgs" id="chatMsgs"></div>
-          <form id="chatForm"><input type="text" id="chatInput" placeholder="Say hi…" maxlength="200" /><button class="small">Send</button></form>
         </div>` : `
         <div class="card">
           <p class="section-label">🏢 Solo mode</p>
-          <p class="sub">Add Supabase (see README) to see classmates' progress and office chat in real time.</p>
+          <p class="sub">Add Supabase (see README) to see classmates' progress on the floor map in real time.</p>
         </div>`}
       </div>
     </div>`;
@@ -197,7 +185,6 @@ function renderGame() {
 
   // roster
   renderRoster();
-  renderChat();
   renderPeers();
 
   // wiring
@@ -228,13 +215,6 @@ function renderGame() {
   };
   app.querySelector('#hintBtn').onclick = () => toast('💡 ' + c.hint);
   app.querySelector('#schemaBtn').onclick = () => toast('Tables: customers, products, distributors, suppliers, orders, order_items', 6000);
-  const cf = app.querySelector('#chatForm');
-  if (cf) cf.onsubmit = async (e) => {
-    e.preventDefault();
-    const inp = app.querySelector('#chatInput');
-    await mp.sendMessage(inp.value);
-    inp.value = '';
-  };
 }
 
 /* ---------------- run + validate ---------------- */
@@ -325,7 +305,7 @@ function solvedMsg(c) {
     ['Nailed it!','Spectacular!','You get it!','CEO-grade work!','Spot on!','Smooth!','Legendary!','Textbook!','Wizardry!','Boardroom-ready!'][c.id - 1]}`;
 }
 
-/* ---------------- roster & chat ---------------- */
+/* ---------------- roster ---------------- */
 function resetGame() {
   state.scene = 0;
   state.completed = 0;
@@ -368,14 +348,6 @@ function renderRoster() {
         <div class="bar"><i style="width:${(p.completed / CHALLENGES.length) * 100}%"></i></div>
       </div>
     </div>`).join('') || '<p class="sub">Nobody else online yet…</p>';
-}
-
-function renderChat() {
-  const el = app.querySelector('#chatMsgs');
-  if (!el) return;
-  el.innerHTML = state.chat.map(m => `<div class="msg"><b>${esc(m.name)}:</b> ${esc(m.text)}</div>`).join('')
-    || '<p class="sub">No messages yet. Say hi! 👋</p>';
-  el.scrollTop = el.scrollHeight;
 }
 
 /* ---------------- victory ---------------- */

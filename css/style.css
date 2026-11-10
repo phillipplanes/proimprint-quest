@@ -154,14 +154,6 @@ button.ghost.danger { background: #fee2e2; color: #b91c1c; border-color: #b91c1c
 .roster .bar > i { display: block; height: 100%; background: linear-gradient(90deg,#22c55e,#330072); border-radius: 99px; transition: width .4s ease; }
 .online-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--good); display: inline-block; }
 
-/* ---------- chat ---------- */
-.chat { display: flex; flex-direction: column; }
-.chat .msgs { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; }
-.chat .msg { font-size: .85rem; background: #f6f1ff; border-radius: 10px; padding: 7px 10px; }
-.chat .msg b { color: var(--accent); }
-.chat form { display: flex; gap: 8px; margin-top: 8px; }
-.chat input { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px; border: 2px solid #d9d2ee; font: inherit; font-size: .85rem; }
-
 /* ---------- confetti / victory ---------- */
 .victory { text-align: center; padding: 40px 20px; }
 .victory .trophy { font-size: 5rem; animation: bob 2s infinite; }
