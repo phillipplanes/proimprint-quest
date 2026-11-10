@@ -6,7 +6,7 @@
 
 import { initDb, query } from './db.js';
 import { CHALLENGES } from './challenges.js';
-import { renderArcade } from './arcade.js';
+import { renderMiniGame } from './minigames.js';
 import * as mp from './multiplayer.js';
 
 /* ---- Supabase config (safe to hardcode: anon key is public) ---- */
@@ -253,15 +253,14 @@ function runChallenge(c) {
   }
 }
 
-/* ---------------- arcade interlude between floors ---------------- */
+/* ---------------- bonus game interlude between floors ---------------- */
 function showBonusRound(nextScene) {
-  renderArcade(app, {
-    level: state.completed,        // floors cleared → difficulty
-    clearedFloor: state.completed,
-    onDone: (score) => {
+  renderMiniGame(app, {
+    index: state.completed - 1,   // one different game per gap between floors
+    onDone: () => {
       state.scene = nextScene;
       state.lastSql = '';
-      toast(`🎉 Packing shift done — ${score} pts! Welcome to the ${CHALLENGES[state.scene].scene}!`);
+      toast(`🎉 Bonus round cleared! Welcome to the ${CHALLENGES[state.scene].scene}!`);
       renderGame();
     },
   });

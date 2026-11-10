@@ -10,10 +10,13 @@ by floor. Each floor is one scene with one challenge; clearing it unlocks the ne
 SQL runs **100% in the browser** with sql.js (SQLite → WebAssembly), so nothing
 leaves the student's laptop except their roster presence.
 
-Between floors, players get a quick **arcade interlude — "Fulfillment
-Rush"**: steer the courier cart and catch falling orders (📦 +10, ☕ +5,
-🎁 +25) while dodging socks nobody ordered (🧦 −6). It gets faster each
-floor, and the office record is saved locally.
+Between floors, players get a **different bonus mini-game** each time, each of
+which reinforces SQL the student has just learned (or is about to): a scrabble-
+style `SELECT` tile puzzle, keyword hangman, the order-packing arcade
+("Fulfillment Rush"), SQL true-or-false, spot-the-broken-query, a
+keyword ↔ purpose matching board, an 8×8 SQL word search
+(COUNT, SUM, GROUP BY…), a clause-ordering challenge, and a
+"which result does this query return?" finale.
 
 ## The 10 challenges (difficulty ramp)
 
