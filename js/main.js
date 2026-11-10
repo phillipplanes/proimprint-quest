@@ -32,12 +32,27 @@ const AVATARS = ['🦊','🐼','🐶','🐱','🐹','🦉','🦄','🦩','🐢',
 /* ============================================================ */
 async function boot() {
   const params = new URLSearchParams(location.search);
-  const ok = mp.configureSupabase(
-    params.get('sb_url') || SUPABASE_URL,
-    params.get('sb_key') || SUPABASE_ANON_KEY,
-  );
-  await initDb();
-  renderIntro(ok);
+  let mpOk = false;
+  try {
+    mpOk = await mp.configureSupabase(
+      params.get('sb_url') || SUPABASE_URL,
+      params.get('sb_key') || SUPABASE_ANON_KEY,
+    );
+  } catch (e) { console.warn('Multiplayer disabled:', e); }
+  try {
+    await initDb();
+  } catch (e) {
+    app.innerHTML = `
+      <div class="card">
+        <h1>🖨️✨ Proimprint Quest</h1>
+        <p>Couldn't load the in-browser SQLite engine (sql.js).</p>
+        <p class="sub">Check your network/CDN access, then reload. If you opened index.html directly from disk, serve it over http instead (e.g. \`python3 -m http.server\`).</p>
+        <p class="sub">Details: <code>${esc(e.message)}</code></p>
+      </div>`;
+    console.error(e);
+    return;
+  }
+  renderIntro(mpOk);
 }
 
 /* ---------------- intro / name screen ---------------- */

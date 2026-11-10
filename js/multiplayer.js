@@ -14,10 +14,19 @@ let onChange = () => {}; // callback when roster/chat updates
 
 const ONLINE_MS = 60_000;
 
-export function configureSupabase(url, anonKey) {
+export async function configureSupabase(url, anonKey) {
   if (!url || !anonKey) return false;
-  sb = window.supabaseJs.createClient(url, anonKey);
-  return true;
+  try {
+    // esm.sh serves a browser-ready ESM bundle; jsdelivr's dist/module
+    // uses bare package specifiers that browsers cannot resolve.
+    const mod = await import('https://esm.sh/@supabase/supabase-js@2');
+    sb = mod.createClient(url, anonKey);
+    return true;
+  } catch (e) {
+    console.warn('Supabase SDK failed to load — falling back to solo mode.', e);
+    sb = null;
+    return false;
+  }
 }
 
 export function hasSupabase() { return !!sb; }
