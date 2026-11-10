@@ -1,0 +1,165 @@
+/* ============================================================
+   Proimprint Quest — styles
+   Hip trendy office vibes: pastel gradients, rounded cards,
+   bouncy cute characters.
+   ============================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg1: #a18cd1; --bg2: #fbc2eb; --bg3: #ffd6a5;
+  --card: rgba(255,255,255,.92);
+  --ink: #2d2a3a; --muted: #7a7390;
+  --accent: #7c4dff; --good: #22c55e; --bad: #ef4444;
+  --shadow: 0 10px 30px rgba(60,30,110,.25);
+}
+
+body {
+  font-family: "Nunito", "Segoe UI", system-ui, sans-serif;
+  color: var(--ink);
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+  background-attachment: fixed;
+}
+
+#app { max-width: 1080px; margin: 0 auto; padding: 18px 16px 60px; }
+
+/* ---------- generic cards ---------- */
+.card {
+  background: var(--card); border-radius: 20px; padding: 22px;
+  box-shadow: var(--shadow); backdrop-filter: blur(6px);
+}
+
+h1 { font-size: clamp(1.6rem, 4vw, 2.6rem); }
+h2 { font-size: clamp(1.2rem, 3vw, 1.7rem); margin-bottom: 10px; }
+.sub { color: var(--muted); margin-top: 6px; }
+
+button {
+  font: inherit; font-weight: 800; cursor: pointer;
+  border: none; border-radius: 999px; padding: 12px 24px;
+  background: var(--accent); color: #fff;
+  box-shadow: 0 6px 16px rgba(124,77,255,.4);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+button:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(124,77,255,.5); }
+button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+button.ghost { background: #fff; color: var(--accent); border: 2px solid var(--accent); box-shadow: none; }
+button.small { padding: 8px 14px; font-size: .85rem; }
+
+input[type=text] {
+  font: inherit; padding: 12px 16px; border-radius: 12px;
+  border: 2px solid #d9d2ee; min-width: 240px;
+}
+
+/* ---------- name / intro screen ---------- */
+.intro { text-align: center; max-width: 560px; margin: 6vh auto 0; }
+.intro .logo { font-size: 4rem; animation: bob 2.4s ease-in-out infinite; }
+.intro .hint { color: var(--muted); font-size: .9rem; margin-top: 10px; }
+
+/* ---------- layout ---------- */
+.grid { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+/* ---------- scene stage ---------- */
+.stage {
+  position: relative; overflow: hidden; min-height: 230px;
+  border-radius: 20px; margin-bottom: 16px;
+  display: flex; align-items: flex-end; justify-content: space-around;
+  padding: 18px; border: 3px solid rgba(255,255,255,.6);
+}
+.stage .decor { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: space-around; font-size: 3rem; opacity: .55; pointer-events: none; }
+.stage .ground { position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: rgba(255,255,255,.45); border-radius: 0 0 16px 16px; }
+
+.char { position: relative; z-index: 2; text-align: center; }
+.char .face { font-size: 3.4rem; display: inline-block; animation: bob 2.2s ease-in-out infinite; }
+.char .bubble {
+  position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%);
+  background: #fff; border-radius: 14px; padding: 10px 14px; width: 220px;
+  font-size: .88rem; box-shadow: var(--shadow); text-align: left;
+  animation: popin .3s ease;
+}
+.char .bubble:after {
+  content: ""; position: absolute; top: 100%; left: 50%; margin-left: -8px;
+  border: 8px solid transparent; border-top-color: #fff;
+}
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes popin { from { transform: translateX(-50%) scale(.7); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+
+/* ---------- SQL editor ---------- */
+textarea#sql {
+  width: 100%; min-height: 120px; font-family: "Fira Code", Consolas, monospace;
+  font-size: .95rem; padding: 14px; border-radius: 14px;
+  border: 2px solid #d9d2ee; background: #fbfaff; resize: vertical;
+}
+textarea#sql:focus { outline: 2px solid var(--accent); }
+
+.result-box { margin-top: 12px; max-height: 240px; overflow: auto; border-radius: 12px; border: 1px solid #e5def7; }
+.result-box table { border-collapse: collapse; width: 100%; font-size: .85rem; }
+.result-box th, .result-box td { border-bottom: 1px solid #eee7f9; padding: 7px 10px; text-align: left; white-space: nowrap; }
+.result-box thead th { background: #f1ebfd; position: sticky; top: 0; }
+
+.feedback { margin-top: 10px; padding: 12px 14px; border-radius: 12px; font-weight: 700; display: none; }
+.feedback.ok { display: block; background: #e8fbef; color: #15803d; border: 2px solid var(--good); }
+.feedback.err { display: block; background: #feeceb; color: #b91c1c; border: 2px solid var(--bad); }
+.feedback .detail { font-weight: 400; margin-top: 6px; font-size: .85rem; }
+
+.editor-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+
+/* ---------- HUD / progress ---------- */
+.hud { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+.hud .pill {
+  background: var(--card); border-radius: 999px; padding: 8px 16px;
+  font-weight: 800; box-shadow: var(--shadow); display: flex; gap: 8px; align-items: center;
+}
+.hud .pill .em { font-size: 1.1rem; }
+
+.map { display: flex; gap: 6px; flex-wrap: wrap; }
+.map .node {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; font-size: .72rem; font-weight: 800;
+  background: #e8e0f7; color: var(--muted);
+  transition: transform .15s ease;
+}
+.map .node.done { background: var(--good); color: #fff; }
+.map .node.current { background: var(--accent); color: #fff; transform: scale(1.2); animation: pulse 1.6s infinite; }
+.map .node.locked { opacity: .45; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(124,77,255,.5); } 50% { box-shadow: 0 0 0 8px rgba(124,77,255,0); } }
+
+/* ---------- roster (multiplayer panel) ---------- */
+.roster .player {
+  display: flex; align-items: center; gap: 10px; padding: 8px 0;
+  border-bottom: 1px dashed #e5def7;
+}
+.roster .player:last-child { border-bottom: none; }
+.roster .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 1.3rem; background: #f1ebfd; }
+.roster .pinfo { flex: 1; min-width: 0; }
+.roster .pname { font-weight: 800; font-size: .9rem; }
+.roster .ptask { font-size: .78rem; color: var(--muted); }
+.roster .bar { height: 8px; background: #ece5fa; border-radius: 99px; overflow: hidden; }
+.roster .bar > i { display: block; height: 100%; background: linear-gradient(90deg,#22c55e,#7c4dff); border-radius: 99px; transition: width .4s ease; }
+.online-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--good); display: inline-block; }
+
+/* ---------- chat ---------- */
+.chat { display: flex; flex-direction: column; }
+.chat .msgs { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 4px 2px; }
+.chat .msg { font-size: .85rem; background: #f6f1ff; border-radius: 10px; padding: 7px 10px; }
+.chat .msg b { color: var(--accent); }
+.chat form { display: flex; gap: 8px; margin-top: 8px; }
+.chat input { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px; border: 2px solid #d9d2ee; font: inherit; font-size: .85rem; }
+
+/* ---------- confetti / victory ---------- */
+.victory { text-align: center; padding: 40px 20px; }
+.victory .trophy { font-size: 5rem; animation: bob 2s infinite; }
+.confetti { position: fixed; top: -20px; font-size: 1.4rem; animation: fall linear forwards; z-index: 50; pointer-events: none; }
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+/* ---------- toast ---------- */
+.toast {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: #fff; padding: 12px 22px; border-radius: 999px;
+  font-weight: 700; z-index: 99; box-shadow: var(--shadow); animation: popin .3s ease;
+}
+
+.section-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 800; margin-bottom: 8px; }
+.mt { margin-top: 16px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
